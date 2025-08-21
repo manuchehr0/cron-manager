@@ -1,10 +1,14 @@
 package cron_manager
 
 import (
+	_ "embed"
 	"html/template"
 	"log"
 	"net/http"
 )
+
+//go:embed front/index.html
+var indexHTML string
 
 func Handler() http.Handler {
 	log.Println("eeeeeeeeeeeeeeeeeeeeeeeeeeee1")
@@ -26,7 +30,7 @@ func Handler() http.Handler {
 			return
 		}
 
-		tmpl, err := template.ParseFiles("./front/index.html")
+		tmpl, err := template.New("index.html").Parse(indexHTML)
 		if err != nil {
 			http.Error(w, "Error loading template", http.StatusInternalServerError)
 			log.Println("template error:", err)
