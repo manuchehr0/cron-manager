@@ -1,4 +1,4 @@
-module cron-manager
+module github.com/manuchehr0/cron-manager
 
 go 1.23.12
 
