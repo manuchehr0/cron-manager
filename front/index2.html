@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cron Manager</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 28px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        main {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #444;
+            font-size: 22px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+        }
+
+        th {
+            background-color: #f0f2f5;
+            font-weight: 600;
+            border-bottom: 2px solid #ddd;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        tr:hover {
+            background-color: #f1f9f1;
+        }
+
+        .btn {
+            padding: 6px 14px;
+            font-size: 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-run {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-run:hover {
+            background-color: #43a047;
+        }
+
+        .no-jobs {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+<header>Cron Manager</header>
+<main>
+    <h2>Jobs</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Last Run</th>
+            <th>Next Run</th>
+            <th>Actions</th>
+        </tr>
+
+        {{ range .Jobs }}
+        <tr>
+            <td>{{ .Id }}</td>
+            <td>{{ .Name }}</td>
+            <td>{{ .LastRun }}</td>
+            <td>{{ .NextRun }}</td>
+            <td>
+                <button class="btn btn-run" onclick="runJob('{{.Id}}')">Run Now</button>
+            </td>
+        </tr>
+        {{ else }}
+        <tr>
+            <td colspan="5" class="no-jobs">No jobs scheduled</td>
+        </tr>
+        {{ end }}
+    </table>
+</main>
+
+<script>
+    function runJob(jobId) {
+        const params = new URLSearchParams({
+            action: "run",
+            job_id: jobId
+        });
+
+        fetch("/cron-manager?" + params.toString(), { method: "GET" })
+            .then(async response => {
+                if (response.ok) {
+                    alert("✅ Job started successfully!");
+                    location.reload();
+                } else {
+                    const text = await response.text();
+                    alert("❌ Failed to start job: " + text);
+                }
+            })
+            .catch(err => {
+                alert("⚠️ Error: " + err);
+            });
+    }
+</script>
+</body>
+</html>
